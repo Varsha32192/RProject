@@ -1,0 +1,83 @@
+---
+title: "Factors Affecting the Salary of an employee"
+output: html_document
+date: '2022-06-05'
+--- 
+
+
+
+
+```{r}
+#Reading the dataset
+data = read.csv('project data.csv')
+
+data
+```
+
+```{r}
+#Structure of Dataset
+str(data)
+```
+We have 1470 rows and   35 columns in our Dataset:
+
+
+
+
+```{r}
+#Checking for null values in the numerical columns.
+library(DataExplorer)
+library(dplyr)
+plot_missing(data)
+```
+We dont have any null Values in the dataset.
+
+
+```{r}
+#let's remove unnecessary columns 
+table(data$StandardHours)
+table(data$EmployeeCount)
+table(data$Over18)
+
+data = subset(data, select = -c(EmployeeCount,StandardHours,Over18) )
+```
+
+
+
+```{r}
+
+data_num = select_if(data,is.numeric)
+data_num
+```
+
+#Lets look at the Correlation between the variables in the Given Dataset :
+
+```{r}
+library(corrplot)
+corrplot(cor(data_num), is.corr = FALSE, method = "square")
+```
+This is hard to interpret the highly correlated values with Salary Variable,
+so let's look deep into the salary variable
+
+```{r}
+library(lares)
+corr_var(data_num, 
+  MonthlyIncome,
+  top = 5 # display top 5 correlations
+)
+```
+The Top 5 Factors of a persons Monthly Income  are Joblevel ,TotalWorkingYears,YearsAtCompany, Age, YearsIncurentRole
+
+
+
+```{r}
+#Modelling
+
+model = lm(MonthlyIncome ~. ,data = data)
+summary(model)
+
+```
+
+Our Model is able to understand the  0.9449 (94.49%) of deviance in the Data
+
+The Variables JobLevel,TotalWorkingYears,JobRoleLaboratory Technician ,JobRoleManager ,JobRoleResearch Director,JobRoleResearch Scientist      are highly significant in predicting the monthly Salary of a person followed by the variables 
+YearsSinceLastPromotion ,YearsWithCurrManager  ,JobInvolvement.
